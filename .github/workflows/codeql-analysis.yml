@@ -27,23 +27,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up build tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake
-
-    - name: List directory contents
-      run: ls -la
-
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
+        # Specify that we are in build mode to allow CodeQL to monitor the build process
+        build: |
+          cmake -B build
+          cmake --build build
 
-    - name: Build code
-      run: |
-        cmake -S . -B build
-        cmake --build build
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
